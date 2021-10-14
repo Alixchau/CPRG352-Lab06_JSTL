@@ -28,7 +28,7 @@
         <form method="POST" action="">
             <ul>
                 <c:forEach var="item" items="${cartItems}">
-                    <li><input type="radio" name="cart_item" value="${item}"></li>
+                    <li><input type="radio" name="cart_item" value="${item}">${item}</li>
                 </c:forEach>
             </ul>
             <input type="submit" value="Delete">  

@@ -2,6 +2,7 @@ package servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,17 +24,16 @@ public class ShoppingListServlet extends HttpServlet {
         //welcome page is ShoppingList page
         //check if userName attribute is null or not, if yes redirect to login page.
         String username = (String) session.getAttribute("userName");
-        String actionValue = request.getParameter("action");
-        if (username != null) {
-            //Handle logout
-            //if (!actionValue.equals("logout")) {
-              //  getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request, response);
-               // return;
 
-           // } else {
-                getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request, response);
+        if (username != null) {
+           String actionValue = request.getParameter("action");
+            if (actionValue != null && actionValue.equals("logout") ) {
+                session.invalidate();
+                getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request, response);
                 return;
-            //}
+            }
+            getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request, response);
+            return;
 
         } else {
             getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request, response);
@@ -61,6 +61,32 @@ public class ShoppingListServlet extends HttpServlet {
                 getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request, response);
                 return;
             }
+        } else if (actionValue.equals("add")) {
+            //get the list of items from the session
+            ArrayList<String> itemList = (ArrayList<String>) session.getAttribute("cartItems");
+            //if there's no list of cartItems in the session, create the list of items
+            if (itemList == null) {
+                itemList = new ArrayList<>();
+            }
+            //get the item added by user
+            //if there an input string , add to the list
+            if (!request.getParameter("cart_item").isEmpty()) {
+                String item = request.getParameter("cart_item");
+                itemList.add(item);
+                session.setAttribute("cartItems", itemList);
+            }
+            getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request, response);
+            return;
+        } else if (actionValue.equals("delete")) {
+            //get the list of items from the session
+            ArrayList<String> itemList = (ArrayList<String>) session.getAttribute("cartItems");
+            String deleteItem = request.getParameter("cart_item");
+            if (deleteItem != null) {
+                itemList.remove(deleteItem);
+            }
+            session.setAttribute("cartItems", itemList);
+            getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request, response);
+            return;
         }
 
     }
